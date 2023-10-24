@@ -11,7 +11,7 @@ export const createContactInHubspot = async (userData) => {
           email: userData.email,
           phone: userData.phoneNumber,
           zip: userData.zipCode,
-          requested_quote: "Yes"
+          requested_quote: "Yes",
 
         }
       },
