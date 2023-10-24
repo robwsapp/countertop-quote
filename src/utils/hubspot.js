@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export const createContactInHubspot = async (userData) => {
   try {
-    const response = await axios.post('http://localhost:3001/api/hubspot/create-contact',
+    const response = await axios.post('https://lakeside-api.vercel.app/api/hubspot/create-contact',
       {
         properties: {
           // Map userData to HubSpot properties here
