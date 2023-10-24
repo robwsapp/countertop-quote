@@ -1,8 +1,9 @@
 import React from 'react';
-import { Typography, Box, Button } from '@mui/material';
+import { Typography, Box, CardContent } from '@mui/material';
+import { useCalendlyEventListener, InlineWidget } from 'react-calendly';
 
 const LocationSpecific = ({ locationName }) => {
-  // Replace these URLs with your actual Calendly URLs
+  
   const calendlyLinks = {
     Kentwood: "https://calendly.com/lakeside-surfaces/kentwood-gallery-free-design-consultation",
     Muskegon: "https://calendly.com/lakeside-surfaces/muskegon-gallery-free-design-consultation",
@@ -14,28 +15,40 @@ const LocationSpecific = ({ locationName }) => {
   // Get the appropriate Calendly link for the current location
   const calendlyLink = calendlyLinks[locationName];
 
+  // Set up Calendly event listeners
+  useCalendlyEventListener({
+    onProfilePageViewed: () => console.log("onProfilePageViewed"),
+    onDateAndTimeSelected: () => console.log("onDateAndTimeSelected"),
+    onEventTypeViewed: () => console.log("onEventTypeViewed"),
+    onEventScheduled: (e) => console.log(e.data.payload),
+  });
+
   return (
     <>
-      <Typography variant="h5" gutterBottom>Book Your Appointment at {locationName}</Typography>
-      <Typography paragraph>
-        Click the button below to schedule your appointment at our {locationName} location.
-      </Typography>
-      <Box mt={2}>
-        <Button 
-          variant="contained" 
-          color="primary" 
-          href={calendlyLink} 
-          target="_blank" 
-          rel="noopener noreferrer"
-        >
-          Schedule at {locationName}
-        </Button>
-      </Box>
-      </>
+      <CardContent>
+        <Typography variant="h5" gutterBottom>Book Your Appointment at {locationName}</Typography>
+        <Typography paragraph>
+          Schedule your appointment at our <strong>{locationName}</strong> location below:
+        </Typography>
+        
+          <InlineWidget 
+            url={calendlyLink}
+            pageSettings={{
+              backgroundColor: 'ffffff',
+              hideEventTypeDetails: true,
+              hideLandingPageDetails: false,
+              primaryColor: '00a2ff',
+              textColor: '4d5055'
+            }}
+          />
+        
+      </CardContent>
+    </>
   );
 };
 
 export default LocationSpecific;
+
 
 
 

@@ -3,12 +3,14 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Button, Typography, Box } from '@mui/material';
+import CssBaseline from '@mui/material/CssBaseline';
 
 const ThankYou = ({ setStep }) => {
   const firstName = useSelector((state) => state.user.firstName);
 
   return (
     <>
+    <CssBaseline />
       <Typography variant="h5" gutterBottom>
         Thank you, {firstName}
       </Typography>

@@ -24,7 +24,29 @@
 .logo-container img {
   width: 100%;  /* or max-width: 100%; */
   height: auto;
-  max-width: 300px; /* You can set max-width as per your need */
+  max-width: 125px; /* You can set max-width as per your need */
   margin-bottom: 16px;
 }
 
+
+
+/* Media query for tablets and larger mobile devices */
+@media (min-width: 480px) and (max-width: 767px) {
+  .step-wrapper-container {
+      padding: 0 30px;
+  }
+}
+
+/* Media query for desktops and larger tablets */
+@media (min-width: 768px) {
+  .step-wrapper-container {
+      padding: 0 50px;
+  }
+}
+
+/* Media query for larger desktops */
+@media (min-width: 1200px) {
+  .step-wrapper-container {
+      padding: 0 80px;
+  }
+}

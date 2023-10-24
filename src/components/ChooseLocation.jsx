@@ -22,10 +22,9 @@ const ChooseLocation = ({ setStep }) => {
           endIcon={<WorkspacePremiumRoundedIcon />}
           className="glowingButton"
           style={{
-            backgroundColor: '#FFD700', // Gold color
             padding: '16px 32px', 
             color: '#FFFFFF', 
-            boxShadow: '0px 9px 30px rgba(255, 215, 0, 0.6)', // Gold shadow
+            boxShadow: '0px 9px 30px rgb(27, 117, 188, 0.6)',
         }}        
         >
           <Typography fontWeight={700} >Kentwood - Flagship Gallery Experience</Typography>

@@ -13,6 +13,7 @@ import BookInHome from './components/BookInHome';
 import ContactSoon from './components/ContactSoon';
 import LocationSpecific from './components/LocationSpecific';
 import { LinearProgress, Paper } from '@mui/material';
+import CssBaseline from '@mui/material/CssBaseline';
 
 import mainLogo from'./lakeside-logo.png';
 
@@ -92,20 +93,31 @@ function App() {
   };
 
   return (
+    <>
+    <CssBaseline />
     <Provider store={store}>
       <div className="app-background">
-  <div className="logo-container">
-    <img src={mainLogo} alt="Lakeside Logo"/>
-  </div>
-  <div className="step-wrapper-container">
-    <Paper elevation={8} style={{ padding: '30px',  maxWidth: '500px', textAlign: 'center' }}>
-      <LinearProgress variant="determinate" value={progress} className="progress-bar" />
-      {getCurrentStepComponent()}
-    </Paper>
-  </div>
+    <div className="logo-container">
+        <img src={mainLogo} alt="Lakeside Logo"/>
+    </div>
+    <div className="step-wrapper-container">
+        <Paper elevation={8} style={{
+            padding: '20px',
+            width: '100%', 
+            margin: '0 auto', 
+            maxWidth: '800px', 
+            maxHeight: '90vh',
+            textAlign: 'center',
+            overflowY: 'auto', 
+        }} sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
+            <LinearProgress variant="determinate" value={progress} className="progress-bar" />
+            {getCurrentStepComponent()}
+        </Paper>
+    </div>
 </div>
 
     </Provider>
+    </>
   );
 }
 

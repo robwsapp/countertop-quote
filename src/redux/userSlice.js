@@ -1,5 +1,4 @@
-// src/redux/userSlice.js
-
+// userSlice.js
 import { createSlice } from '@reduxjs/toolkit';
 
 const userSlice = createSlice({
@@ -9,19 +8,19 @@ const userSlice = createSlice({
     lastName: '',
     phoneNumber: '',
     email: '',
-    // Add any other user data fields here
+    zipCode: '',
+    fileUrls: [],  // Store URLs of uploaded drawings
   },
   reducers: {
     setUserData: (state, action) => {
-      state.firstName = action.payload.firstName;
-      state.lastName = action.payload.lastName;
-      state.phoneNumber = action.payload.phoneNumber;
-      state.email = action.payload.email;
-      // Add any other user data fields here
+      // Use Object.assign or spread operator to merge state
+      Object.assign(state, action.payload);
+  },  
+    setFileUrls: (state, action) => {  // Adding new reducer for file URLs
+      state.fileUrls = action.payload;
     },
-    // You may define additional reducers here if needed
   },
 });
 
-export const { setUserData } = userSlice.actions;
+export const { setUserData, setFileUrls } = userSlice.actions;
 export default userSlice.reducer;
