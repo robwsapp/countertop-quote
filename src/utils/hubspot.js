@@ -5,15 +5,14 @@ export const createContactInHubspot = async (userData) => {
     const response = await axios.post('https://lakeside-api.vercel.app/api/hubspot/create-contact',
       {
         properties: {
-          // Map userData to HubSpot properties here
           firstname: userData.firstName,
           lastname: userData.lastName,
           email: userData.email,
           phone: userData.phoneNumber,
           zip: userData.zipCode,
           requested_quote: "Yes",
-
-        }
+        },
+        hubspotutk: userData.hubspotutk // Add this line
       },
       {
         headers: {
@@ -27,4 +26,3 @@ export const createContactInHubspot = async (userData) => {
     throw error;
   }
 };
-

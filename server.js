@@ -7,7 +7,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const axios = require('axios');
 
-const PORT = process.env.PORT || 3001;
+// const PORT = process.env.PORT || 3001;
 
 const app = express();
 
@@ -31,110 +31,153 @@ const userSchema = new mongoose.Schema({
 });
 const User = mongoose.model('User', userSchema);
 
+app.get('/', (req, res) => {
+  res.send('Hey Welcome to the Lakeside API 🥳')
+})
 
 // API route for form submission
 app.post('/api/submit', async (req, res) => {
-    try {
-      console.log('Received request:', req.body);
-      
-      sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-      const { firstName, lastName, phoneNumber, email, fileUrls } = req.body;
-  
-      const user = new User({
-        firstName,
-        lastName,
-        phoneNumber,
-        email,
-        zipCode,
-        fileUrls,
-      });
-      await user.save();
-  
-      console.log('User saved:', user);
-      
-      const msg = {
-        to: 'galleries@lakesideinc.com',
-        from: 'hello@lakesideinc.com',
-        subject: 'New Quote Request',
-        text: `New quote request from ${firstName} ${lastName}. Contact them at ${email} or ${phoneNumber}.`,
-        html: `<p>New quote request from ${firstName} ${lastName}.</p><p>Contact them at ${email} or ${phoneNumber}.</p>`,
-      };
-  
-      // Check if there are file URLs
-      if (fileUrls && fileUrls.length > 0) {
-        // Modify msg to include attachments (if they exist)
-        msg.attachments = fileUrls.map(url => ({
-          filename: url.split("/").pop(),
-          path: url,
-          disposition: 'attachment',
-        }));
-      }
-      
-      // Send the email
-      await sgMail.send(msg);
-  
-      //... rest of your code
-    } catch (error) {
-      //... error handling
+  try {
+    console.log('Received request:', req.body);
+    
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    const { firstName, lastName, phoneNumber, email, zipCode, fileUrls } = req.body;
+
+    const user = new User({
+      firstName,
+      lastName,
+      phoneNumber,
+      email,
+      zipCode,
+      fileUrls,
+    });
+    await user.save();
+
+    console.log('User saved:', user);
+    
+    const msg = {
+      to: 'galleries@lakesideinc.com',
+      from: 'hello@lakesideinc.com',
+      subject: 'New Quote Request',
+      text: `New quote request from ${firstName} ${lastName}. Contact them at ${email} or ${phoneNumber}.`,
+      html: `<p>New quote request from ${firstName} ${lastName}.</p><p>Contact them at ${email} or ${phoneNumber}.</p>`,
+    };
+
+    // Check if there are file URLs
+    if (fileUrls && fileUrls.length > 0) {
+      // Modify msg to include attachments (if they exist)
+      msg.attachments = fileUrls.map(url => ({
+        filename: url.split("/").pop(),
+        path: url,
+        disposition: 'attachment',
+      }));
     }
-  });
+    
+    // Send the email
+    await sgMail.send(msg);
+
+    res.status(200).send({ message: "Success" }); // Send a success response
+
+  } catch (error) {
+    console.error('Error in /api/submit:', error);
+    res.status(500).send({
+      error: 'Internal Server Error',
+      message: 'Error handling form submission',
+    });
+  }
+});
+
 
   app.use((req, res, next) => {
     console.log('Incoming request:', req.method, req.path);
     next();
   });
   
-
-  app.post('/api/hubspot/create-contact', async (req, res) => {
+  const setHubspotCommunicationPreferences = async (emailAddress) => {
     try {
-        const hubspotResponse = await axios.post('https://api.hubapi.com/crm/v3/objects/contacts', req.body, {
+        const subscriptionPayload = {
+            emailAddress: emailAddress,
+            legalBasis: "LEGITIMATE_INTEREST_PQL",
+            subscriptionId: "64775317", // This should be the ID of your subscription in HubSpot
+            legalBasisExplanation: "User Opted In By Filling Out Quote Form"
+        };
+
+        await axios.post('https://api.hubapi.com/email/public/v1/subscriptions/:email/status', subscriptionPayload, {
             headers: {
                 'Authorization': `Bearer ${process.env.HUBSPOT_ACCESS_TOKEN}`,
                 'Content-Type': 'application/json'
             }
         });
-        res.status(200).json(hubspotResponse.data);
     } catch (error) {
-        console.error('Error proxying request to HubSpot:', error.response ? error.response.data : error);
-        
-        if (error.response && error.response.data && error.response.data.category === 'CONFLICT') {
-          const existingId = error.response.data.message.match(/Existing ID: (\d+)/)[1];
-          console.log("Attempting to update contact with ID:", existingId);
-          
-          // Update existing contact
-          try {
-              console.log("Update payload:", JSON.stringify(req.body, null, 2)); // Let's log the payload we're sending to HubSpot
-      
-              const updateResponse = await axios.patch(`https://api.hubapi.com/crm/v3/objects/contacts/${existingId}`, req.body, {
-                  headers: {
-                      'Authorization': `Bearer ${process.env.HUBSPOT_ACCESS_TOKEN}`,
-                      'Content-Type': 'application/json'
-                  }
-              });
-      
-              console.log("Update response:", JSON.stringify(updateResponse.data, null, 2)); // Let's log the response from HubSpot after the update
-      
-              return res.status(200).json(updateResponse.data);
-          } catch (updateError) {
-              console.error('Error updating contact in HubSpot:', updateError.response ? JSON.stringify(updateError.response.data, null, 2) : updateError);
-              return res.status(500).send({
-                  error: 'Internal Server Error',
-                  message: 'Error updating contact in HubSpot',
-                  details: updateError.response ? updateError.response.data : null
-              });
-          }
-      
-
-        }
-
-        res.status(500).send({
-            error: 'Internal Server Error',
-            message: 'Error proxying request to HubSpot',
-            details: error.response ? error.response.data : null
-        });
+        console.error('Error setting communication preferences in HubSpot:', error);
     }
-});
+};
 
+app.post('/api/hubspot/create-contact', async (req, res) => {
+  try {
+    const hubspotPayload = {
+      properties: {
+        ...req.body.properties,
+        requested_quote: "Yes"
+      },
+      context: {
+        hutk: req.body.hubspotutk // Add this line
+      }
+    };
+
+    const hubspotResponse = await axios.post('https://api.hubapi.com/crm/v3/objects/contacts', hubspotPayload, {
+      headers: {
+        'Authorization': `Bearer ${process.env.HUBSPOT_ACCESS_TOKEN}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    await setHubspotCommunicationPreferences(req.body.properties.email);
+    res.status(200).json(hubspotResponse.data);
+
+  } catch (error) {
+    console.error('Error proxying request to HubSpot:', error.response ? JSON.stringify(error.response.data, null, 2) : error);
+    
+    if (error.response && error.response.data && error.response.data.message.includes("contact already exists")) {
+      try {
+        const searchResponse = await axios.get(`https://api.hubapi.com/crm/v3/objects/contacts/search`, {
+          headers: {
+            'Authorization': `Bearer ${process.env.HUBSPOT_ACCESS_TOKEN}`,
+            'Content-Type': 'application/json'
+          },
+          params: {
+            query: req.body.properties.email
+          }
+        });
+        const existingId = searchResponse.data.results[0].id;
+        const updateResponse = await axios.patch(`https://api.hubapi.com/crm/v3/objects/contacts/${existingId}`, hubspotPayload, {
+          headers: {
+            'Authorization': `Bearer ${process.env.HUBSPOT_ACCESS_TOKEN}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        return res.status(200).json(updateResponse.data);
+      } catch (updateError) {
+        console.error('Error updating contact in HubSpot:', updateError);
+        if (updateError.response) {
+          console.error('Update error data from HubSpot:', JSON.stringify(updateError.response.data));
+          console.error('Update error status from HubSpot:', updateError.response.status);
+          console.error('Update error headers from HubSpot:', JSON.stringify(updateError.response.headers));
+        }
+        return res.status(500).send({
+          error: 'Internal Server Error',
+          message: 'Error updating contact in HubSpot',
+          details: updateError.response ? updateError.response.data : null
+        });
+      }
+    } else {
+      res.status(500).send({
+        error: 'Internal Server Error',
+        message: 'Error proxying request to HubSpot',
+        details: error.response ? error.response.data : null
+      });
+    }
+  }
+});
 
 
 // Create an S3 client
@@ -180,8 +223,12 @@ app.post('/api/get-upload-url', async (req, res) => {
 });
 
 
+// Export the Express API
+module.exports = app
+
 // Start the server
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+
+// app.listen(PORT, () => { //
+ // console.log(`Server is running on port ${PORT}`);
+// }); 

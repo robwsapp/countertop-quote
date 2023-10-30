@@ -36,8 +36,9 @@ const Connect = ({ setStep }) => {
       dispatch(setUserData(values));
 
       try {
+        const hubspotutk = document.cookie.split('; ').find(row => row.startsWith('hubspotutk=')).split('=')[1];
         // Create a contact in HubSpot
-        await createContactInHubspot(values);
+        await createContactInHubspot({...values, hubspotutk });
         setSeverity('success');
         setSnackbarMessage('Data stored successfully!');
       } catch (error) {
