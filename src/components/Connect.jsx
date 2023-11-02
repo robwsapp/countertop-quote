@@ -35,12 +35,17 @@ const Connect = ({ setStep }) => {
       // Update the Redux store with the user data
       dispatch(setUserData(values));
 
-      try {
+       try {
         const hubspotutk = document.cookie.split('; ').find(row => row.startsWith('hubspotutk=')).split('=')[1];
         // Create a contact in HubSpot
         await createContactInHubspot({...values, hubspotutk });
         setSeverity('success');
         setSnackbarMessage('Data stored successfully!');
+        
+        // Google Ads Conversion Tracking
+        if (typeof window !== 'undefined' && window.gtag) {
+          window.gtag('event', 'conversion', {'send_to': 'AW-11094284555/4Zk0CPa7lvMYEIuylaop'});
+        }
       } catch (error) {
         setSeverity('error');
         setSnackbarMessage('Error creating contact in HubSpot. Please try again.');
