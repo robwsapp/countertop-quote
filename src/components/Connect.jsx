@@ -43,9 +43,10 @@ const Connect = ({ setStep }) => {
         setSnackbarMessage('Data stored successfully!');
         
         // Google Ads Conversion Tracking
-        if (typeof window !== 'undefined' && window.gtag) {
-          window.gtag('event', 'conversion', {'send_to': 'AW-11094284555/4Zk0CPa7lvMYEIuylaop'});
+        if (typeof window !== 'undefined' && window.gtag_report_conversion) {
+          window.gtag_report_conversion();
         }
+        
       } catch (error) {
         setSeverity('error');
         setSnackbarMessage('Error creating contact in HubSpot. Please try again.');
