@@ -8,10 +8,13 @@ import { createContactInHubspot } from '../utils/hubspot'; // Import the HubSpot
 import CssBaseline from '@mui/material/CssBaseline';
 
 // Validation schema
+// Updated Validation schema with optional hyphens
 const validationSchema = yup.object({
   firstName: yup.string().required('First name is required'),
   lastName: yup.string().required('Last name is required'),
-  phoneNumber: yup.string().required('Phone number is required'),
+  phoneNumber: yup.string()
+                 .matches(/^[2-9]{1}[0-9]{2}-?[2-9]{1}[0-9]{2}-?[0-9]{4}$/, 'Phone number must be in a valid format, with or without hyphens')
+                 .required('Phone number is required'),
   email: yup.string().email('Enter a valid email').required('Email is required'),
   zipCode: yup.string().required('Zip code is required'),
 });
