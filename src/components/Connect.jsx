@@ -16,7 +16,7 @@ const validationSchema = yup.object({
                  .matches(/^[2-9]{1}[0-9]{2}-?[2-9]{1}[0-9]{2}-?[0-9]{4}$/, 'Phone number must be in a valid format, with or without hyphens')
                  .required('Phone number is required'),
   email: yup.string().email('Enter a valid email').required('Email is required'),
-  zipCode: yup.string().required('Zip code is required'),
+  zipCode: yup.string().matches(/^\d{5}$/, 'Zip code must be a 5-digit number').required('Zip code is required'),
 });
 
 const Connect = ({ setStep }) => {
