@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useFormik } from 'formik';
+import { useFormik, useField } from 'formik';
 import * as yup from 'yup';
 import { TextField, Button, Typography, Box, Snackbar, Alert, CardContent, Grid } from '@mui/material';
 import { setUserData } from '../redux/userSlice';
@@ -16,7 +16,7 @@ const validationSchema = yup.object({
                  .matches(/^[2-9]{1}[0-9]{2}-?[2-9]{1}[0-9]{2}-?[0-9]{4}$/, 'Phone number must be in a valid format, with or without hyphens')
                  .required('Phone number is required'),
   email: yup.string().email('Enter a valid email').required('Email is required'),
-  zipCode: yup.string().matches(/^\d{5}$/, 'Zip code must be a 5-digit number').required('Zip code is required'),
+  zipCode: yup.string().matches(/^\d{5}$/, 'Zip code must be a 5-digit number').required('Zip code is required'), // Updated zip code validation
 });
 
 const Connect = ({ setStep }) => {
@@ -77,19 +77,54 @@ const Connect = ({ setStep }) => {
 
             <Grid container spacing={1}>
                 <Grid item xs={12} md={6}>
-                    <TextField fullWidth margin="normal" label="First Name" {...formik.getFieldProps('firstName')} />
+                    <TextField
+                      fullWidth
+                      margin="normal"
+                      label="First Name"
+                      {...useField('firstName')[0]}
+                      error={formik.touched.firstName && Boolean(formik.errors.firstName)}
+                      helperText={formik.touched.firstName && formik.errors.firstName}
+                    />
                 </Grid>
                 <Grid item xs={12} md={6}>
-                    <TextField fullWidth margin="normal" label="Last Name" {...formik.getFieldProps('lastName')} />
+                    <TextField
+                      fullWidth
+                      margin="normal"
+                      label="Last Name"
+                      {...useField('lastName')[0]}
+                      error={formik.touched.lastName && Boolean(formik.errors.lastName)}
+                      helperText={formik.touched.lastName && formik.errors.lastName}
+                    />
                 </Grid>
                 <Grid item xs={12}>
-                    <TextField fullWidth margin="normal" label="Phone Number" {...formik.getFieldProps('phoneNumber')} />
+                    <TextField
+                      fullWidth
+                      margin="normal"
+                      label="Phone Number"
+                      {...useField('phoneNumber')[0]}
+                      error={formik.touched.phoneNumber && Boolean(formik.errors.phoneNumber)}
+                      helperText={formik.touched.phoneNumber && formik.errors.phoneNumber}
+                    />
                 </Grid>
                 <Grid item xs={12}>
-                    <TextField fullWidth margin="normal" label="Email" {...formik.getFieldProps('email')} />
+                    <TextField
+                      fullWidth
+                      margin="normal"
+                      label="Email"
+                      {...useField('email')[0]}
+                      error={formik.touched.email && Boolean(formik.errors.email)}
+                      helperText={formik.touched.email && formik.errors.email}
+                    />
                 </Grid>
                 <Grid item xs={12}>
-                    <TextField fullWidth margin="normal" label="Project Zip Code" {...formik.getFieldProps('zipCode')} />
+                    <TextField
+                      fullWidth
+                      margin="normal"
+                      label="Project Zip Code"
+                      {...useField('zipCode')[0]}
+                      error={formik.touched.zipCode && Boolean(formik.errors.zipCode)}
+                      helperText={formik.touched.zipCode && formik.errors.zipCode}
+                    />
                 </Grid>
             </Grid>
 
@@ -113,5 +148,3 @@ const Connect = ({ setStep }) => {
 };
 
 export default Connect;
-
-
